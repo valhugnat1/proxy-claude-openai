@@ -1,0 +1,11 @@
+{
+    "name": "codex-router",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Standalone Anthropic↔OpenAI format converter with TLS bypass for internal CAs",
+    "main": "server.mjs",
+    "scripts": {
+        "start": "node server.mjs",
+        "dev": "LOG_REQUESTS=true node server.mjs"
+    }
+}
