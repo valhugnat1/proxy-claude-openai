@@ -1,68 +1,71 @@
 # codex-router
 
-Standalone Node.js server that converts between Anthropic and OpenAI API formats, with TLS bypass for internal CA certificates.
-
-Replaces the wrangler/workerd-based y-router that can't handle internal TLS certs.
+Proxy Node.js qui convertit le format API Anthropic (Claude Code) vers le format OpenAI (Scaleway Generative APIs) et inversement, en streaming SSE.
 
 ## Architecture
 
 ```
-Claude Code (Anthropic format)
+Claude Code (format Anthropic)
     ↓ HTTP
-codex-router (localhost:8787) — Anthropic→OpenAI + TLS bypass
-    ↓ HTTPS (rejectUnauthorized: false)
-Staging: codex-srr-staging.atl.internal.scaleway.com ✅
+codex-router (localhost:8787) — conversion Anthropic ↔ OpenAI
+    ↓ HTTPS
+Scaleway Generative APIs
 ```
 
-## Requirements
+## Prérequis
 
-- Node.js ≥ 18 (uses native `fetch`-era APIs, but only `http`/`https` modules)
-- Zero npm dependencies
+- Node.js ≥ 18
+- Zéro dépendance npm
 
 ## Quick start
 
 ```bash
-# Start the router pointing at your staging backend
-UPSTREAM_BASE_URL=https://codex-srr-staging.atl.internal.scaleway.com \
-  node server.mjs
+# Lancer le router
+UPSTREAM_BASE_URL=https://api.scaleway.ai node server.js
 
-# Or with verbose logging
-UPSTREAM_BASE_URL=https://codex-srr-staging.atl.internal.scaleway.com \
-  LOG_REQUESTS=true node server.mjs
+# Avec logs détaillés (bodies JSON)
+UPSTREAM_BASE_URL=https://api.scaleway.ai LOG_REQUESTS=true node server.js
 ```
 
-## Configure Claude Code
+## Configurer Claude Code
 
 ```bash
 export ANTHROPIC_BASE_URL=http://localhost:8787
+export ANTHROPIC_MODEL=qwen3.5-397b-a17b
 ```
 
-## Environment variables
+Le modèle est passé tel quel au backend — changer `ANTHROPIC_MODEL` suffit pour switcher de modèle.
 
-| Variable | Required | Default | Description |
+## Variables d'environnement
+
+| Variable | Requis | Défaut | Description |
 |---|---|---|---|
-| `UPSTREAM_BASE_URL` | ✅ | — | Full URL of the OpenAI-compatible backend |
-| `PORT` | | `8787` | Listen port |
-| `LOG_REQUESTS` | | `false` | Log truncated request/response bodies |
+| `UPSTREAM_BASE_URL` | ✅ | — | URL de base Scaleway (ex: `https://api.scaleway.ai`) |
+| `PORT` | | `8787` | Port d'écoute |
+| `LOG_REQUESTS` | | `false` | Log les bodies JSON complets (tronqués à 3000 chars) |
 
 ## Endpoints
 
-| Path | Method | Description |
+| Path | Méthode | Description |
 |---|---|---|
-| `/v1/messages` | POST | Anthropic Messages API (converts & proxies to upstream) |
-| `/health` | GET | Health check (returns upstream URL) |
+| `/v1/messages` | POST | API Messages Anthropic → converti et proxifié vers l'upstream |
+| `/health` | GET | Health check (retourne l'URL upstream) |
 
-## What it does
+## Ce que fait le proxy
 
-1. Receives Anthropic-format requests from Claude Code
-2. Converts messages, tools, and system prompts to OpenAI format
-3. Forwards to the upstream backend with `rejectUnauthorized: false` (bypasses internal CA)
-4. Converts the OpenAI response back to Anthropic format (both streaming SSE and non-streaming)
-5. Returns to Claude Code in the expected Anthropic format
+1. Reçoit les requêtes au format Anthropic depuis Claude Code
+2. Convertit messages, tools et system prompts au format OpenAI
+3. Forward vers Scaleway Generative APIs
+4. Convertit la réponse OpenAI en format Anthropic (streaming SSE et non-streaming)
+5. Retourne à Claude Code dans le format attendu
 
-## Differences from y-router
+## Logs
 
-- **No Docker** — runs directly on your machine
-- **No wrangler/workerd** — plain Node.js, no Cloudflare runtime restrictions
-- **TLS bypass** — `rejectUnauthorized: false` works natively in Node.js
-- **Zero dependencies** — only Node.js built-in modules (`http`, `https`, `url`)# proxy-claude-openai
+Les logs sont toujours actifs et affichent pour chaque requête :
+- Modèle entrant et sortant
+- Nombre de messages et tools
+- Flow des messages
+- Status upstream et temps de réponse
+- Stats de streaming (chunks, bytes, durée totale)
+
+`LOG_REQUESTS=true` ajoute en plus les bodies JSON complets.
