@@ -1,5 +1,5 @@
 /**
- * codex-router — standalone Node.js server
+ * qwen3.5-scw-router — standalone Node.js server
  * Converts Anthropic API format ↔ OpenAI API format
  * Forwards to Scaleway genAPI with TLS bypass for internal CA certs.
  *
@@ -684,7 +684,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n🚀 codex-router listening on http://localhost:${PORT}`);
+  console.log(`\n🚀 qwen3.5-scw-router listening on http://localhost:${PORT}`);
   console.log(`   Upstream: ${UPSTREAM_BASE_URL}`);
   console.log(`   Logging:  ${LOG_REQUESTS ? "enabled" : "disabled"}`);
   console.log(`\n   Configure Claude Code with:`);
