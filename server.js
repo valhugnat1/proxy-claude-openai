@@ -1,7 +1,7 @@
 /**
  * codex-router — standalone Node.js server
  * Converts Anthropic API format ↔ OpenAI API format
- * Forwards to staging backend with TLS bypass for internal CA certs.
+ * Forwards to Scaleway genAPI with TLS bypass for internal CA certs.
  *
  * Usage:
  *   UPSTREAM_BASE_URL=https://api.scaleway.ai \
