@@ -4,7 +4,7 @@
  * Forwards to staging backend with TLS bypass for internal CA certs.
  *
  * Usage:
- *   UPSTREAM_BASE_URL=https://codex-srr-staging.atl.internal.scaleway.com \
+ *   UPSTREAM_BASE_URL=https://api.scaleway.ai \
  *   node server.mjs
  *
  * Environment variables:
@@ -25,9 +25,7 @@ const LOG_REQUESTS = process.env.LOG_REQUESTS === "true";
 
 if (!UPSTREAM_BASE_URL) {
   console.error("❌ UPSTREAM_BASE_URL is required. Example:");
-  console.error(
-    "   UPSTREAM_BASE_URL=https://codex-srr-staging.atl.internal.scaleway.com node server.mjs",
-  );
+  console.error("   UPSTREAM_BASE_URL=https://api.scaleway.ai node server.mjs");
   process.exit(1);
 }
 
