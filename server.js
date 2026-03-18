@@ -25,7 +25,7 @@ const LOG_REQUESTS = process.env.LOG_REQUESTS === "true";
 
 if (!UPSTREAM_BASE_URL) {
   console.error("❌ UPSTREAM_BASE_URL is required. Example:");
-  console.error("   UPSTREAM_BASE_URL=https://api.scaleway.ai node server.mjs");
+  console.error("   UPSTREAM_BASE_URL=https://api.scaleway.ai node server.js");
   process.exit(1);
 }
 
